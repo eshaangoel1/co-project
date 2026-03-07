@@ -126,3 +126,87 @@ def bin_12(a):
     else:
         pass
     return a
+    
+def bin_20(a):
+    a=bin(a)[2:]
+    if len(a)<20:
+        b=a[::-1]
+        while(len(b)!=20):
+            b+="0"
+        a=b[::-1]
+    else:
+        pass
+    return a
+
+def r_inst(a,b,c,d):
+    print(R_INSTRUCTIONS[a][0],end="")
+    p=b.rstrip(",")
+    q=c.rstrip(",")
+    print(REGISTERS[d],end="")
+    print(REGISTERS[q],end="")
+    print(R_INSTRUCTIONS[a][1],end="")
+    print(REGISTERS[p],end="")
+    print(R_INSTRUCTIONS[a][2],end="")
+    print()
+
+def b_inst(a,b,c,d,e):
+    e = int(e) // 2
+    if int(e)<0:
+        e=(2**12)+int(e)
+    m=int(e)
+    m=bin_12(m)
+    imm12=m[0]
+    imm10_5=m[2:8]
+    imm4_1=m[8:12]
+    imm11=m[1]
+    b=b.rstrip(",")
+    c=c.rstrip(",")
+    print(imm12+imm10_5,end="")
+    print(REGISTERS[c],end="")
+    print(REGISTERS[b],end="")
+    print(B_INSTRUCTIONS[a][0],end="")
+    print(imm4_1+imm11,end="")
+    print(B_INSTRUCTIONS[a][1],end="")
+    print()
+
+def i_arth(a,b,c,d):
+    if int(d)<0:
+        d=(2**12)+int(d)
+    m=bin_12(int(d))
+    print(m,end="")
+    b=b.rstrip(",")
+    c=c.rstrip(",")
+    print(REGISTERS[c],end="")
+    print(I_ARTH[a][0],end="")
+    print(REGISTERS[b],end="")
+    print(I_ARTH[a][1],end="")
+    print()
+
+def s_inst(a,b,c):
+    d=c.split("(")
+    e=d[0]
+    f=d[1]
+    f=f.rstrip(")")
+    if int(e)<0:
+        e=(2**12)+int(e)
+    m=int(e)
+    m=bin_12(m)
+    n=m[:7]
+    o=m[7:]
+    print(n,end="")
+    b=b.rstrip(",")
+    print(REGISTERS[b],end="")
+    print(REGISTERS[f],end="")
+    print(S_INSTRUCTIONS[a][0],end="")
+    print(o,end="")
+    print(S_INSTRUCTIONS[a][1],end="")
+    print()
+
+def u_inst(a,b,c):
+    t=int(c)
+    c=bin_20(t)
+    b=b.rstrip(",")
+    print(c,end="")
+    print(REGISTERS[b],end="")
+    print(U_INSTRUCTIONS[a],end="")
+    print()
