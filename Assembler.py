@@ -403,3 +403,97 @@ def error_det(t,k,labels):
                 except:
                     print(f"{t[i][2]} label not found at line number {i+1}")
                     return -1
+
+
+with open(sys.argv[1],"r") as f:
+    l=f.readlines()
+
+l = [x.rstrip("\n") for x in l]
+for i in l:
+    if i=="":
+        l.remove(i)
+t=[]
+for i in l:
+    i = i.replace(",", ", ")
+    t.append(i.split())
+
+k=[]
+for i in t:
+    k.append(i[0])
+
+PC=0
+labels={}
+for i in k:
+    for j in i:
+        if j==":":
+            q=i.rstrip(":")
+            labels[q]=PC
+            break
+    PC+=4
+
+
+for i in range(len(k)):
+    if ":" in k[i]:
+        k[i]=t[i][1]
+
+
+for i in t:
+    if ":" in i[0]:
+        i[0]=i[1]
+        i[1]=i[2]
+        i[2]=i[3]
+        try:
+            i[3]=i[4]
+        except IndexError:
+            pass
+        i.pop()
+
+outputfile = open(sys.argv[2], "w+")
+sys.stdout = outputfile
+
+a=error_det(t,k,labels)
+
+if a!=-1:
+    PC=0
+    for i in range(len(k)):
+
+        if k[i] in R_INSTRUCTIONS:
+            r_inst(t[i][0],t[i][1],t[i][2],t[i][3].rstrip(","))
+
+        elif k[i] in I_ARTH:
+            i_arth(t[i][0],t[i][1],t[i][2],t[i][3])
+
+        elif k[i] in B_INSTRUCTIONS:
+            if t[i][3] in labels:
+                lab_val=labels[t[i][3]]
+                offset=lab_val-PC
+            else:
+                offset=int(t[i][3])
+            if (offset<=4094 and offset>=-4096):
+                b_inst(t[i][0],t[i][1],t[i][2],t[i][3],offset)
+            else:
+                print(f'Wrong immediate value at line number {i+1}')
+
+        elif k[i] in U_INSTRUCTIONS:
+            u_inst(t[i][0],t[i][1],t[i][2])
+
+        elif k[i] in J_INSTRUCTIONS:
+            lab_val=labels[t[i][2]]
+            offset=lab_val-PC
+            if (offset<=1048574 and offset>=-1048576):
+                j_inst(t[i][0],t[i][1],t[i][2],offset)
+            else:
+                print(f'Wrong immediate value at line number {i+1}')
+
+        elif k[i] in S_INSTRUCTIONS:
+            s_inst(t[i][0],t[i][1],t[i][2])
+
+        elif k[i] in I_LOAD:
+            i_load(t[i][0],t[i][1],t[i][2])
+        
+        elif k[i] in I_JUMP:
+            i_jump(t[i][0],t[i][1],t[i][2],t[i][3])
+
+        PC+=4
+
+outputfile.close()
