@@ -210,3 +210,50 @@ def u_inst(a,b,c):
     print(REGISTERS[b],end="")
     print(U_INSTRUCTIONS[a],end="")
     print()
+
+def j_inst(a,b,c,d):
+    d=int(d)//2
+    if int(d)<0:
+        d=(2**20)+int(d)
+    m=int(d)
+    m=bin_20(m)
+    imm20 = m[0]
+    imm19_12 = m[1:9]
+    imm11 = m[9]
+    imm10_1 = m[10:20]
+    b=b.rstrip(",")
+    print(imm20 + imm10_1 + imm11 + imm19_12, end="")
+    print(REGISTERS[b], end="")
+    print(J_INSTRUCTIONS[a], end="")
+    print()
+
+def i_load(a,b,c):
+    d=c.split("(")
+    e=d[0]
+    f=d[1]
+    f=f.rstrip(")")
+    if int(e)<0:
+        e=(2**12)+int(e)
+    m=int(e)
+    m=bin_12(m)
+    print(m,end="")
+    b=b.rstrip(",")
+    print(REGISTERS[f],end="")
+    print(I_LOAD[a][0],end="")
+    print(REGISTERS[b],end="")
+    print(I_LOAD[a][1],end="")
+    print()
+
+def i_jump(a,b,c,d):
+    if int(d)<0:
+        d=(2**12)+int(d)
+    m=int(d)
+    m=bin_12(m)
+    print(m,end="")
+    b=b.rstrip(",")
+    c=c.rstrip(",")
+    print(REGISTERS[c],end="")
+    print(I_JUMP[a][0],end="")
+    print(REGISTERS[b],end="")
+    print(I_JUMP[a][1],end="")
+    print()
