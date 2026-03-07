@@ -257,3 +257,149 @@ def i_jump(a,b,c,d):
     print(REGISTERS[b],end="")
     print(I_JUMP[a][1],end="")
     print()
+
+def error_det(t,k,labels):
+    for i in range(len(k)):
+        if (k[i] not in R_INSTRUCTIONS and k[i] not in I_ARTH and k[i] not in I_JUMP and k[i] not in I_LOAD and k[i] not in U_INSTRUCTIONS and k[i] not in J_INSTRUCTIONS and k[i] not in S_INSTRUCTIONS and k[i] not in B_INSTRUCTIONS):
+            print(f'Wrong instruction name "{k[i]}" at line number {i+1}')
+            return -1
+    
+    for i in range(len(t)):
+        if k[i] in R_INSTRUCTIONS:
+            if len(t[i][1:])<3:
+                print(f'Less number of arguments than required at line {i+1}')
+                return -1
+        if k[i] in I_ARTH:
+            if len(t[i][1:])<3:
+                print(f'Less number of arguments than required at line {i+1}')
+                return -1
+        if k[i] in I_JUMP:
+            if len(t[i][1:])<3:
+                print(f'Less number of arguments than required at line {i+1}')
+                return -1
+        if k[i] in I_LOAD:
+            if len(t[i][1:])<2:
+                print(f'Less number of arguments than required at line {i+1}')
+                return -1
+        if k[i] in B_INSTRUCTIONS:
+            if len(t[i][1:])<3:
+                print(f'Less number of arguments than required at line {i+1}')
+                return -1
+        if k[i] in S_INSTRUCTIONS:
+            if len(t[i][1:])<2:
+                print(f'Less number of arguments than required at line {i+1}')
+                return -1
+        if k[i] in U_INSTRUCTIONS:
+            if len(t[i][1:])<2:
+                print(f'Less number of arguments than required at line {i+1}')
+                return -1
+        if k[i] in J_INSTRUCTIONS:
+            if len(t[i][1:])<2:
+                print(f'Less number of arguments than required at line {i+1}')
+                return -1
+
+    for i in range(len(t)):
+        if k[i] in S_INSTRUCTIONS or k[i] in I_LOAD:
+            try:
+                z=t[i][2]
+                q=z.split("(")[1].rstrip(")")
+            except:
+                print(f"Formatting not done properly at line number {i+1}")
+                return -1
+
+    reg=[]
+    for i in range(len(t)):
+        if k[i] in R_INSTRUCTIONS:
+            reg.append([t[i][1].rstrip(","),t[i][2].rstrip(","),t[i][3]])
+        if k[i] in I_ARTH:
+            reg.append([t[i][1].rstrip(","),t[i][2].rstrip(",")])
+        if k[i] in I_JUMP:
+            reg.append([t[i][1].rstrip(","), t[i][2].rstrip(",")])
+        if k[i] in I_LOAD:
+            z=t[i][2]
+            if z[-1]==")":
+                q=z.split("(")[1].rstrip(")")
+            else:
+                print(f"Formatting not done properly at line number {i+1}")
+                return -1
+            reg.append([t[i][1].rstrip(","),q])
+        if k[i] in B_INSTRUCTIONS:
+            reg.append([t[i][1].rstrip(","),t[i][2].rstrip(",")])
+        if k[i] in S_INSTRUCTIONS:
+            z=t[i][2]
+            if z[-1]==")":
+                q=z.split("(")[1].rstrip(")")
+            else:
+                print(f"Formatting not done properly at line number {i+1}")
+                return -1
+            reg.append([t[i][1].rstrip(","),q])
+        if k[i] in U_INSTRUCTIONS:
+            reg.append([t[i][1].rstrip(",")])
+        if k[i] in J_INSTRUCTIONS:
+            reg.append([t[i][1].rstrip(",")])
+
+    for i in range(len(reg)):
+        for j in reg[i]:
+            if j not in REGISTERS:
+                print(f'Wrong register name {j} at line number {i+1}')
+                return -1
+    
+    for i in range(len(t)): 
+        if k[i] in I_ARTH:
+            try:
+                if (int(t[i][3])>2047 or int(t[i][3])<-2048):
+                    print(f'Wrong immediate value at line number {i+1}')
+                    return -1
+            except ValueError:
+                print(f"Wrong immediate value given at line number {i+1}")
+                return -1
+        if k[i] in I_JUMP:
+            try:
+                if (int(t[i][3])>2047 or int(t[i][3])<-2048):
+                    print(f'Wrong immediate value at line number {i+1}')
+                    return -1
+            except ValueError:
+                print(f"Wrong immediate value given at line number {i+1}")
+                return -1
+        if k[i] in I_LOAD:
+            d=t[i][2].split("(")
+            try:
+                if (int(d[0])>2047 or int(d[0])<-2048):
+                    print(f'Wrong immediate value at line number {i+1}')
+                    return -1
+            except ValueError:
+                print(f"Wrong immediate value given at line number {i+1}")
+                return -1
+        if k[i] in S_INSTRUCTIONS:
+            d=t[i][2].split("(")
+            try:
+                if (int(d[0])>2047 or int(d[0])<-2048):
+                    print(f'Wrong immediate value at line number {i+1}')
+                    return -1
+            except ValueError:
+                print(f"Wrong immediate value given at line number {i+1}")
+                return -1
+        if k[i] in U_INSTRUCTIONS:
+            try:
+                if (int(t[i][2])>1048575 or int(t[i][2])<0):
+                    print(f'Wrong immediate value at line number {i+1}')
+                    return -1
+            except ValueError:
+                print(f"Wrong immediate value given at line number {i+1}")
+                return -1
+        
+    for i in range(len(t)):
+        if k[i] in B_INSTRUCTIONS:
+            if t[i][3] not in labels:
+                try:
+                    int(t[i][3])
+                except:
+                    print(f"{t[i][3]} label not found at line number {i+1}")
+                    return -1
+        if k[i] in J_INSTRUCTIONS:
+            if t[i][2] not in labels:
+                try:
+                    int(t[i][2])
+                except:
+                    print(f"{t[i][2]} label not found at line number {i+1}")
+                    return -1
