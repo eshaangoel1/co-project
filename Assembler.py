@@ -530,7 +530,7 @@ for i in t:
             pass
         i.pop()
 
-outputfile = open(sys.argv[2], "w+")
+outputfile = open(sys.argv[2], "w")
 sys.stdout = outputfile
 
 a=error_det(t,k,labels,l)
