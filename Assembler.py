@@ -258,12 +258,73 @@ def i_jump(a,b,c,d):
     print(I_JUMP[a][1],end="")
     print()
 
-def error_det(t,k,labels):
+def error_det(t,k,labels,l):
+
     for i in range(len(k)):
         if (k[i] not in R_INSTRUCTIONS and k[i] not in I_ARTH and k[i] not in I_JUMP and k[i] not in I_LOAD and k[i] not in U_INSTRUCTIONS and k[i] not in J_INSTRUCTIONS and k[i] not in S_INSTRUCTIONS and k[i] not in B_INSTRUCTIONS):
             print(f'Wrong instruction name "{k[i]}" at line number {i+1}')
             return -1
     
+    for i in range(len(l)):
+        ss=l[i].count(",")
+
+        if k[i] in R_INSTRUCTIONS:
+            if ss<2:
+                print(f"Missing , at line number {i+1}")
+                return -1
+            elif ss>2:
+                print(f"Extra , at line number {i+1}")
+                return -1
+        if k[i] in I_ARTH:
+            if ss<2:
+                print(f"Missing , at line number {i+1}")
+                return -1
+            elif ss>2:
+                print(f"Extra , at line number {i+1}")
+                return -1
+        if k[i] in I_JUMP:
+            if ss<2:
+                print(f"Missing , at line number {i+1}")
+                return -1
+            elif ss>2:
+                print(f"Extra , at line number {i+1}")
+                return -1
+        if k[i] in I_LOAD:
+            if ss<1:
+                print(f"Missing , at line number {i+1}")
+                return -1
+            elif ss>2:
+                print(f"Extra , at line number {i+1}")
+                return -1
+        if k[i] in B_INSTRUCTIONS:
+            if ss<2:
+                print(f"Missing , at line number {i+1}")
+                return -1
+            elif ss>2:
+                print(f"Extra , at line number {i+1}")
+                return -1
+        if k[i] in S_INSTRUCTIONS:
+            if ss<1:
+                print(f"Missing , at line number {i+1}")
+                return -1
+            elif ss>2:
+                print(f"Extra , at line number {i+1}")
+                return -1
+        if k[i] in U_INSTRUCTIONS:
+            if ss<1:
+                print(f"Missing , at line number {i+1}")
+                return -1
+            elif ss>2:
+                print(f"Extra , at line number {i+1}")
+                return -1
+        if k[i] in J_INSTRUCTIONS:
+            if ss<1:
+                print(f"Missing , at line number {i+1}")
+                return -1
+            elif ss>2:
+                print(f"Extra , at line number {i+1}")
+                return -1
+
     for i in range(len(t)):
         if k[i] in R_INSTRUCTIONS:
             if len(t[i][1:])<3:
@@ -317,8 +378,14 @@ def error_det(t,k,labels):
             reg.append([t[i][1].rstrip(","), t[i][2].rstrip(",")])
         if k[i] in I_LOAD:
             z=t[i][2]
-            if z[-1]==")":
-                q=z.split("(")[1].rstrip(")")
+            ll=z.count(")")
+            mm=z.count("(")
+            if ll==1 and mm==1:
+                if z[-1]==")":
+                    q=z.split("(")[1].rstrip(")")
+                else:
+                    print(f"Formatting not done properly at line number {i+1}")
+                    return -1
             else:
                 print(f"Formatting not done properly at line number {i+1}")
                 return -1
@@ -327,11 +394,17 @@ def error_det(t,k,labels):
             reg.append([t[i][1].rstrip(","),t[i][2].rstrip(",")])
         if k[i] in S_INSTRUCTIONS:
             z=t[i][2]
-            if z[-1]==")":
-                q=z.split("(")[1].rstrip(")")
+            ll=z.count(")")
+            mm=z.count("(")
+            if ll==1 and mm==1:
+                if z[-1]==")":
+                    q=z.split("(")[1].rstrip(")")
+                else:
+                    print(f"Formatting not done properly at line number {i+1}")
+                    return -1
             else:
                 print(f"Formatting not done properly at line number {i+1}")
-                return -1
+                return -1    
             reg.append([t[i][1].rstrip(","),q])
         if k[i] in U_INSTRUCTIONS:
             reg.append([t[i][1].rstrip(",")])
@@ -404,6 +477,15 @@ def error_det(t,k,labels):
                     print(f"{t[i][2]} label not found at line number {i+1}")
                     return -1
 
+    ff=0 
+    for i in range(len(t)):
+        if t[i]==['beq', 'zero,', 'zero,', '0']:
+            ff=1
+            break
+    if ff==0:
+        print("Halt instruction is not present")
+        return -1
+
 
 with open(sys.argv[1],"r") as f:
     l=f.readlines()
@@ -451,7 +533,7 @@ for i in t:
 outputfile = open(sys.argv[2], "w+")
 sys.stdout = outputfile
 
-a=error_det(t,k,labels)
+a=error_det(t,k,labels,l)
 
 if a!=-1:
     PC=0
