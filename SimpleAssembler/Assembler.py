@@ -265,6 +265,73 @@ def error_det(t,k,labels,l):
             print(f'Wrong instruction name "{k[i]}" at line number {i+1}')
             return -1
     
+
+    for i in range(len(t)):
+        
+        if k[i] in R_INSTRUCTIONS:
+            if len(t[i][1:])<3:
+                print(f'Less number of arguments than required at line {i+1}')
+                return -1
+            elif len(t[i][1:])>3:
+                print(f'More number of arguments than required at line {i+1}')
+                return -1
+            
+        if k[i] in I_ARTH:
+            if len(t[i][1:])<3:
+                print(f'Less number of arguments than required at line {i+1}')
+                return -1
+            elif len(t[i][1:])>3:
+                print(f'More number of arguments than required at line {i+1}')
+                return -1
+            
+        if k[i] in I_JUMP:
+            if len(t[i][1:])<3:
+                print(f'Less number of arguments than required at line {i+1}')
+                return -1
+            elif len(t[i][1:])>3:
+                print(f'More number of arguments than required at line {i+1}')
+                return -1
+            
+        if k[i] in I_LOAD:
+            if len(t[i][1:])<2:
+                print(f'Less number of arguments than required at line {i+1}')
+                return -1
+            elif len(t[i][1:])>2:
+                print(f'More number of arguments than required at line {i+1}')
+                return -1
+            
+        if k[i] in B_INSTRUCTIONS:
+            if len(t[i][1:])<3:
+                print(f'Less number of arguments than required at line {i+1}')
+                return -1
+            elif len(t[i][1:])>3:
+                print(f'More number of arguments than required at line {i+1}')
+                return -1
+            
+        if k[i] in S_INSTRUCTIONS:
+            if len(t[i][1:])<2:
+                print(f'Less number of arguments than required at line {i+1}')
+                return -1
+            elif len(t[i][1:])>2:
+                print(f'More number of arguments than required at line {i+1}')
+                return -1
+            
+        if k[i] in U_INSTRUCTIONS:
+            if len(t[i][1:])<2:
+                print(f'Less number of arguments than required at line {i+1}')
+                return -1
+            elif len(t[i][1:])>2:
+                print(f'More number of arguments than required at line {i+1}')
+                return -1
+            
+        if k[i] in J_INSTRUCTIONS:
+            if len(t[i][1:])<2:
+                print(f'Less number of arguments than required at line {i+1}')
+                return -1
+            elif len(t[i][1:])>2:
+                print(f'More number of arguments than required at line {i+1}')
+                return -1
+
     for i in range(len(l)):
         ss=l[i].count(",")
 
@@ -323,40 +390,6 @@ def error_det(t,k,labels,l):
                 return -1
             elif ss>2:
                 print(f"Extra , at line number {i+1}")
-                return -1
-
-    for i in range(len(t)):
-        if k[i] in R_INSTRUCTIONS:
-            if len(t[i][1:])<3:
-                print(f'Less number of arguments than required at line {i+1}')
-                return -1
-        if k[i] in I_ARTH:
-            if len(t[i][1:])<3:
-                print(f'Less number of arguments than required at line {i+1}')
-                return -1
-        if k[i] in I_JUMP:
-            if len(t[i][1:])<3:
-                print(f'Less number of arguments than required at line {i+1}')
-                return -1
-        if k[i] in I_LOAD:
-            if len(t[i][1:])<2:
-                print(f'Less number of arguments than required at line {i+1}')
-                return -1
-        if k[i] in B_INSTRUCTIONS:
-            if len(t[i][1:])<3:
-                print(f'Less number of arguments than required at line {i+1}')
-                return -1
-        if k[i] in S_INSTRUCTIONS:
-            if len(t[i][1:])<2:
-                print(f'Less number of arguments than required at line {i+1}')
-                return -1
-        if k[i] in U_INSTRUCTIONS:
-            if len(t[i][1:])<2:
-                print(f'Less number of arguments than required at line {i+1}')
-                return -1
-        if k[i] in J_INSTRUCTIONS:
-            if len(t[i][1:])<2:
-                print(f'Less number of arguments than required at line {i+1}')
                 return -1
 
     for i in range(len(t)):
