@@ -49,7 +49,7 @@ def decode(s):
         return a,None,c,None,None
     return None
 
-def execute(s,registers,mem,r1,r2,rd,f3,f7,pc):
+def execute(s,registers,mem,r1,r2,rd,f3,f7,pc,l_no):
     t=s[-1:-8:-1]
     opcode=t[::-1]
     res=0
@@ -97,7 +97,7 @@ def execute(s,registers,mem,r1,r2,rd,f3,f7,pc):
         elif f3=="111":
             res=n(registers[a]&registers[b])
         else:
-            print("Invalid funct3 or funct7 value")
+            print(f'Invalid funct3 or funct7 value at line no. {l_no}')
             registers[0]=0
             return -1
         registers[0]=0
@@ -105,14 +105,14 @@ def execute(s,registers,mem,r1,r2,rd,f3,f7,pc):
     #lw
     elif opcode=="0000011":
         if f3!="010":
-            print("Invalid funct3 value ")
+            print(f'Invalid funct3 value at line no. {l_no}')
             return -1
         a=s_i(r1)
         b=s_i(r2)
         c=s_i(rd)
         add=registers[a]+b
         if mem_check(add)==0:
-            print("Invalid memory access ")
+            print(f'Invalid memory access at line no. {l_no}')
             return "error"
         if add in mem:
             res=n(mem[add])
@@ -138,7 +138,7 @@ def execute(s,registers,mem,r1,r2,rd,f3,f7,pc):
             else:
                 res=0
         else:
-            print("Invalid funct3 value")
+            print(f'Invalid funct3 value at line no. {l_no}')
             registers[0]=0
             return -1
         registers[0]=0
@@ -146,7 +146,7 @@ def execute(s,registers,mem,r1,r2,rd,f3,f7,pc):
     #jalr
     elif opcode=="1100111":
         if f3!="000":
-            print("Invalid funct3 value ")
+            print(f'Invalid funct3 value at line no. {l_no}')
             return -1
         
         a=s_i(r1)
@@ -161,14 +161,14 @@ def execute(s,registers,mem,r1,r2,rd,f3,f7,pc):
     #sw
     elif opcode=="0100011":
         if f3!="010":
-            print("Invalid funct3 value ")
+            print(f'Invalid funct3 value at line no. {l_no}')
             return -1
         a=s_i(r1)
         b=s_i(r2)
         c=s_i(rd)
         add=registers[a]+c
         if mem_check(add)==0:
-            print("Invalid memory access ")
+            print(f'Invalid memory access at line no. {l_no}')
             return "error"
         mem[add]=registers[b]
         registers[0]=0
@@ -218,7 +218,7 @@ def execute(s,registers,mem,r1,r2,rd,f3,f7,pc):
                 registers[0]=0
                 return pc+c
         else:
-            print("Invalid funct3 value")
+            print(f'Invalid funct3 value at line no. {l_no}')
             registers[0]=0
             return -1
         registers[0]=0
@@ -249,7 +249,7 @@ def execute(s,registers,mem,r1,r2,rd,f3,f7,pc):
         registers[0]=0
         return pc+a
     else:
-        print("Invalid opcode value")
+        print(f'Invalid opcode value at line no. {l_no}')
         registers[0]=0
         return -1
 
@@ -321,29 +321,30 @@ def main(registers):
         mem[i]=0
     for j in range(len(l)):
         l[j]=l[j].strip("\n")
-    for i in l:
-        if len(i)!=32:
-            print("Number of bits not equal to 32 ")
+    for i in range(len(l)):
+        if len(l[i])!=32:
+            print(f'Number of bits not equal to 32 at line no. {i+1}')
             return -1
-        for j in i:
+        for j in l[i]:
             if j!="0" and j!="1":
-                print("Bits other than 0 and 1 ")
+                print(f'Bits other than 0 and 1 at line no. {i+1}')
                 return -1
             
     while True:
         if pc<0 or pc>=len(l)*4:
-            print("PC out of instruction memory range ")
+            print(f'PC out of instruction memory range at line no. {(pc//4)+1}')
             return -1
         if pc%4!=0:
-            print("Unaligned instruction address")
+            print(f'Unaligned instruction address at line no. {(pc//4)+1}')
             return -1
         ins=l[pc//4]
         decoded=decode(ins)
         if decoded is None:
-            print("Invalid instruction encoding ")
+            print(f'Invalid instruction encoding at line no. {(pc//4)+1}')
             return -1
         r1,r2,rd,f3,f7=decoded
-        a=execute(ins,registers,mem,r1,r2,rd,f3,f7,pc)
+        l_no=(pc//4)+1
+        a=execute(ins,registers,mem,r1,r2,rd,f3,f7,pc,l_no)
         if a=="error":
             return -1
         if a==-1:
