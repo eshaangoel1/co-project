@@ -320,7 +320,7 @@ def main(registers):
     for i in range(0x00000100,0x00000180,4):
         mem[i]=0
     for j in range(len(l)):
-        l[j]=l[j].strip("\n")
+        l[j]=l[j].strip()
     for i in range(len(l)):
         if len(l[i])!=32:
             print(f'Number of bits not equal to 32 at line no. {i+1}')
