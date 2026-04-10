@@ -1,4 +1,4 @@
-
+import sys
 
 def decode(s):
     t=s[-1:-8:-1]
@@ -282,3 +282,84 @@ def n(x):
     if x>=2**31:
         x-=2**32
     return x
+
+def mem_check(x):
+    if 0x00000100<=x<=0x0000017C or 0x00010000<=x<=0x0001007C:
+        if x%4==0:
+            return 1
+        else:
+            return 0
+    else:
+        return 0
+    
+def bi(x):
+    x=x&0xFFFFFFFF
+    a=bin(x)[2:]
+    while len(a)<32:
+        a="0"+a
+    return "0b"+a
+
+def read(pc,registers,mem):
+    vals = [bi(pc)]
+    for i in registers:
+        vals.append(bi(i))
+    print(" ".join(vals))
+
+def main(registers):
+    with open(sys.argv[1],"r") as f:
+        l=f.readlines()
+    if len(l)>64:
+        print("Program exceeds instruction memory ")
+        return -1
+    
+    pc=0
+    mem={}
+    for i in range(0x00010000,0x00010080,4):
+        mem[i]=0
+
+    for i in range(0x00000100,0x00000180,4):
+        mem[i]=0
+    for j in range(len(l)):
+        l[j]=l[j].strip("\n")
+    for i in l:
+        if len(i)!=32:
+            print("Number of bits not equal to 32 ")
+            return -1
+        for j in i:
+            if j!="0" and j!="1":
+                print("Bits other than 0 and 1 ")
+                return -1
+            
+    while True:
+        if pc<0 or pc>=len(l)*4:
+            print("PC out of instruction memory range ")
+            return -1
+        if pc%4!=0:
+            print("Unaligned instruction address")
+            return -1
+        ins=l[pc//4]
+        decoded=decode(ins)
+        if decoded is None:
+            print("Invalid instruction encoding ")
+            return -1
+        r1,r2,rd,f3,f7=decoded
+        a=execute(ins,registers,mem,r1,r2,rd,f3,f7,pc)
+        if a=="error":
+            return -1
+        if a==-1:
+            read(pc,registers,mem)
+            break
+        else:
+            read(a,registers,mem)
+            pc=a
+    for addr in range(0x00010000, 0x00010080, 4):
+        print(f"0x{addr:08X}:{bi(mem[addr])}")
+
+outputfile = open(sys.argv[2], "w")
+sys.stdout = outputfile
+
+registers=[0]*32
+registers[2]=0x0000017C
+a=main(registers)
+
+outputfile.close()
