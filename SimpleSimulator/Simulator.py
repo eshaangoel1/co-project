@@ -157,4 +157,128 @@ def execute(s,registers,mem,r1,r2,rd,f3,f7,pc):
             registers[c]=n(pc+4)
         registers[0]=0
         return newpc-(newpc%2)
+
+    #sw
+    elif opcode=="0100011":
+        if f3!="010":
+            print("Invalid funct3 value ")
+            return -1
+        a=s_i(r1)
+        b=s_i(r2)
+        c=s_i(rd)
+        add=registers[a]+c
+        if mem_check(add)==0:
+            print("Invalid memory access ")
+            return "error"
+        mem[add]=registers[b]
+        registers[0]=0
+        return pc+4
+
+    #b type instructions
+    elif opcode=="1100011":
+        a=s_i(r1)
+        b=s_i(r2)
+        c=s_i(rd)
+        if f3=='000' and a==0 and b==0 and c==0:
+            return -1
+        if f3=='000':
+            if registers[a]==registers[b]:
+                registers[0]=0
+                return pc+c                                             
+        elif f3=='001': 
+            if registers[a]!=registers[b]:
+                registers[0]=0
+                return pc+c                                               
+        elif f3=='100':
+            if registers[a]<registers[b]:
+                registers[0]=0
+                return pc+c              
+        elif f3=='101':
+            if registers[a]>=registers[b]:
+                registers[0]=0
+                return pc+c              
+        elif f3=='110':
+            x=registers[a]
+            y=registers[b]
+            if x<0:
+                x+=2**32
+            if y<0:
+                y+=2**32
+            if x<y:
+                registers[0]=0
+                return pc+c    
+        elif f3=='111':
+            x=registers[a]
+            y=registers[b]
+            if x<0:
+                x+=2**32
+            if y<0:
+                y+=2**32
+            if x>=y:
+                registers[0]=0
+                return pc+c
+        else:
+            print("Invalid funct3 value")
+            registers[0]=0
+            return -1
+        registers[0]=0
+        return pc+4
     
+    #lui
+    elif opcode=="0110111":
+        a=s_i(r1)
+        c=s_i(rd)
+        if c!=0:
+            registers[c]=n(a<<12)
+        registers[0]=0
+    
+    #auipc
+    elif opcode=="0010111":
+        a=s_i(r1)
+        c=s_i(rd)
+        if c!=0:
+            registers[c]=n(pc+(a<<12))
+        registers[0]=0
+
+    #jal
+    elif opcode=="1101111":
+        a=s_i(r1)
+        c=s_i(rd)
+        if c!=0:
+            registers[c]=n(pc+4)
+        registers[0]=0
+        return pc+a
+    else:
+        print("Invalid opcode value")
+        registers[0]=0
+        return -1
+
+    if c!=0:
+        registers[c]=n(res)
+    return pc+4
+
+def s_i(s):
+    e=len(s)
+    t=0
+    for i in s:
+        i=int(i)
+        t+=i*(2**(e-1))
+        e-=1
+    if s[0]=="1":
+        t-=2**len(s)
+    return t
+
+def n_i(s):
+    e=len(s)
+    t=0
+    for i in s:
+        i=int(i)
+        t+=i*(2**(e-1))
+        e-=1
+    return t
+
+def n(x):
+    x=x&0xFFFFFFFF
+    if x>=2**31:
+        x-=2**32
+    return x
