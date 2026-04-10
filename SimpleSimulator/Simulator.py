@@ -1,4 +1,5 @@
 
+
 def decode(s):
     t=s[-1:-8:-1]
     opcode=t[::-1]
@@ -47,3 +48,113 @@ def decode(s):
         c=s[-12:-7]
         return a,None,c,None,None
     return None
+
+def execute(s,registers,mem,r1,r2,rd,f3,f7,pc):
+    t=s[-1:-8:-1]
+    opcode=t[::-1]
+    res=0
+
+    #R instruction
+    if opcode=="0110011":
+        a=s_i(r1)
+        b=s_i(r2)
+        c=s_i(rd)
+        if f3=="000" and f7=="0000000":
+            res=n(registers[a]+registers[b])
+        elif f3=="000" and f7=="0100000":
+            res=n(registers[a]-registers[b])
+        elif f3=="001":
+            d=registers[b]%32
+            res=registers[a]*(2**d)
+            res=n(res%(2**32))
+        elif f3=="010":
+            if registers[a]<registers[b]:
+                res=1
+            else:
+                res=0
+        elif f3=="011":
+            x=registers[a]
+            y=registers[b]
+            if x<0:
+                x+=2**32
+            if y<0:
+                y+=2**32
+            if x<y:
+                res=1
+            else:
+                res=0
+        elif f3=="100":
+            res=n(registers[a]^registers[b])
+        elif f3=="101":
+            x=registers[a]
+            y=registers[b]
+            d=y%32
+            if x<0:
+                x+=2**32
+            res=n(x//(2**d))
+        elif f3=="110":
+            res=n(registers[a]|registers[b])
+        elif f3=="111":
+            res=n(registers[a]&registers[b])
+        else:
+            print("Invalid funct3 or funct7 value")
+            registers[0]=0
+            return -1
+        registers[0]=0
+
+    #lw
+    elif opcode=="0000011":
+        if f3!="010":
+            print("Invalid funct3 value ")
+            return -1
+        a=s_i(r1)
+        b=s_i(r2)
+        c=s_i(rd)
+        add=registers[a]+b
+        if mem_check(add)==0:
+            print("Invalid memory access ")
+            return "error"
+        if add in mem:
+            res=n(mem[add])
+        registers[0]=0
+
+    #addi
+    elif opcode=="0010011":
+        a=s_i(r1)
+        c=s_i(rd)
+        
+        if f3=="000":
+            b=s_i(r2)
+            res=n(registers[a]+b)
+        elif f3=="011":
+            b=n_i(r2)
+            x=registers[a]
+            if x<0:
+                x+=2**32
+            if b<0:
+                b+=2**32
+            if x<b:
+                res=1
+            else:
+                res=0
+        else:
+            print("Invalid funct3 value")
+            registers[0]=0
+            return -1
+        registers[0]=0
+
+    #jalr
+    elif opcode=="1100111":
+        if f3!="000":
+            print("Invalid funct3 value ")
+            return -1
+        
+        a=s_i(r1)
+        b=s_i(r2)
+        c=s_i(rd)
+        newpc=registers[a]+b
+        if c!=0:
+            registers[c]=n(pc+4)
+        registers[0]=0
+        return newpc-(newpc%2)
+    
